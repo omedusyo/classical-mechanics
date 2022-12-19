@@ -1,0 +1,136 @@
+// To start parcel. It will watch the changes in compiled purescript code.
+npm run dev
+
+// To compile and watch
+spago build --watch
+
+// or you can use pscid to build
+// is this like a compiling + watch with nice interface?
+pscid
+
+
+add this to your package.json to build stuff
+    "build": "webpack ./main.js",
+
+or you can use
+
+  npx webpack ./main.js
+
+
+
+spago install lib1 lib2
+
+
+
+
+spago repl
+
+{foo: 123, bar: 512} { foo = 3 }
+
+:t (\r -> r { foo = 3 })
+
+f :: forall (r :: Row Type) (a :: Type) . { foo :: a | r } -> { foo :: Int | r }
+
+
+
+import Prelude
+
+import Data.List
+
+
+import Hello
+
+
+:t square
+
+
+square 5
+
+:t (\x -> x*x) 5.5
+
+:t 5
+
+
+spago run
+
+spago bundle-app --watch
+
+import Data.List
+
+:kind List
+
+:kind Lam
+
+:t _.foo
+
+:k List
+
+:k List Int
+
+((\x -> x + 1) >>> (\y -> y*y)) 5
+
+
+:t log
+
+log "\"hello\"" >>= (\_ -> log "wat")
+
+
+Effect.random
+
+import Effect.Random (random, randomBool)
+
+:t random
+
+data Pair a b = Pair a b
+
+derive instance showPair :: (Show a, Show b) => Show (Pair a b)
+
+instance showPair :: (Show a, Show b) => Show (Pair a b) where
+  show (Pair x y) = "(" <> show x <> ", " <> show y <> ")"
+
+"(" <> show 3 <> ", " <> show true <> ")"
+
+"dsad" <> "ds"
+
+Pair 3 4
+
+randomBool >>= (\b -> random >>= (\x -> pure 1))
+
+[1,"dsa"]
+
+:t pure
+
+:t  (>>=)
+
+
+
+import Data.Array as Array
+
+
+[1,2,3] # Array.splitAt 2
+
+Array.replicate 3 512
+
+
+
+spago repl
+
+import ClassicalMechanics.Pendulum
+
+:r
+
+microAction = microActionPendulum (config0 5.0)
+
+:t microAction
+
+integrate microAction 0.2 { time: 0.0, position: 0.0, velocity: 0.0 } 0.001
+
+:r
+
+import Data.Number ( cos, pi )
+
+pi
+
+
+3.0 / 2.0 + 1.0
+
