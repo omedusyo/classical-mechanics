@@ -1,4 +1,4 @@
-module ClassicalMechanics.Pendulum ( Config, config0, State, microFlow, render, update, Msg(..) ) where
+module ClassicalMechanics.Pendulum ( Config, config0, State, microFlow, render, update, Msg(..), modByFloat ) where
 
 import Prelude
 import Effect (Effect)
@@ -6,6 +6,9 @@ import Effect.Console ( log )
 import ClassicalMechanics.System as System
 import Data.Number ( cos, sin, pi )
 import Canvas as Canvas
+
+-- First argument is the modulus. Is there a library for this?
+foreign import modByFloat :: Number -> Number -> Number
 
 
 type Config = { gravity :: Number, radius :: Number }
@@ -18,8 +21,8 @@ type State = { time :: Number, position :: Number, velocity :: Number }
 microFlow :: Config -> System.MicroFlow State
 microFlow config state epsilon =
   state
-    { time = state.time + epsilon
-    , position = state.position + epsilon * state.velocity
+    { time = state.time + epsilon 
+    , position = (state.position + epsilon * state.velocity) # modByFloat (2.0*pi) -- TODO: Will this work?
     , velocity = state.velocity + epsilon * (- config.gravity / config.radius) * cos state.position
     }
 
@@ -45,6 +48,10 @@ render clear fromCartesianToCanvas config state canvasRef = do
   circle # Canvas.arc pendulumCenterCanvasCoord.canvasX pendulumCenterCanvasCoord.canvasY 20.0 0.0 (2.0*pi) -- 20 is in pixels
   canvasRef # Canvas.stroke circle
 
+  pure unit
+
+renderState :: (Canvas.CanvasRef -> Effect Unit) -> ({ x :: Number, y :: Number } -> { canvasX :: Number, canvasY :: Number }) -> Config -> State -> Canvas.CanvasRef -> Effect Unit
+renderState clear fromCartesianToCanvas config state canvasRef = do
   pure unit
 
 data Msg =

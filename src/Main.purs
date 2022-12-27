@@ -5,8 +5,6 @@ import Prelude
 import Effect (Effect)
 import Effect.Console (log)
 
-import Hello (square)
-
 import DOM as DOM
 import VDOM.Render as Render
 import VDOM.Examples (ex1, updateCounter, initialCounterModel, viewCounter)
@@ -54,7 +52,6 @@ main = do
   --     pure state
   -- )
 
-  -- log (show (square 5))
 
   -- ===canvas===
   root <- DOM.root
@@ -111,13 +108,12 @@ main = do
         canvasRef
           # Pendulum.render
               -- TODO: Figure out how to make trails
-              -- (Canvas.clear canvasConfig0)
-              (clearWithOpacity canvasConfig0)
+              (Canvas.clear canvasConfig0)
+              -- (clearWithOpacity canvasConfig0)
               (cartesianToCanvasCoord canvasConfig0)
               pendulumConfig
               newPendulumState
 
-        log (show state.shouldRequestAnimationFrame)
         if msg.shouldRequestAnimationFrame then do
           requestAnimationFrame pendulumStore
         else
