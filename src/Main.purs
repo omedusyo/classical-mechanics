@@ -16,6 +16,7 @@ import Store as Store
 import Event as Event
 
 import Canvas as Canvas
+import CanvasGeometry.Element as Element 
 
 
 canvasConfig0 :: Canvas.CanvasConfig
@@ -105,14 +106,12 @@ main = do
         newPendulumState <-
           Pendulum.update pendulumConfig msg.pendulumMsg state.pendulumState
 
-        canvasRef
-          # Pendulum.render
-              -- TODO: Figure out how to make trails
-              (Canvas.clear canvasConfig0)
-              -- (clearWithOpacity canvasConfig0)
-              (cartesianToCanvasCoord canvasConfig0)
-              pendulumConfig
-              newPendulumState
+        canvasRef # Canvas.clear canvasConfig0
+        Element.render
+          canvasConfig0
+          canvasRef
+          (Pendulum.view pendulumConfig newPendulumState)
+
 
         if msg.shouldRequestAnimationFrame then do
           requestAnimationFrame pendulumStore
@@ -124,13 +123,6 @@ main = do
       initState
   
   requestAnimationFrame pendulumStore
-
-  -- canvasRef
-  --   # Pendulum.render
-  --       (cartesianToCanvasCoord canvasConfig0)
-  --       pendulumConfig
-  --       { time: 0.0, position: 1.20 * 2.0*pi, velocity: 0.0 }
-
 
   -- ===Buttons===
   button0 <- DOM.make "button"

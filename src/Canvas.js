@@ -20,6 +20,11 @@ export const setFillStyle = color => ctx => () => {
   return null;
 };
 
+export const setStrokeStyle = color => ctx => () => {
+  ctx.strokeStyle = color;
+  return null;
+};
+
 export const foreignClear = width => height => ctx => () => {
   ctx.clearRect(0, 0, width, height);
   return null;

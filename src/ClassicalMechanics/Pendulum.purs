@@ -1,11 +1,23 @@
-module ClassicalMechanics.Pendulum ( Config, config0, State, microFlow, render, update, Msg(..), modByFloat ) where
+module ClassicalMechanics.Pendulum
+  ( Config
+  , State
+  , Msg(..)
+
+  , config0
+  , microFlow
+  , update
+
+  , view
+  ) where
 
 import Prelude
 import Effect (Effect)
-import Effect.Console ( log )
 import ClassicalMechanics.System as System
 import Data.Number ( cos, sin, pi )
-import Canvas as Canvas
+
+import CanvasGeometry.Element as Element
+import CanvasGeometry.Point as Point
+import CanvasGeometry.Color as Color
 
 -- First argument is the modulus. Is there a library for this?
 foreign import modByFloat :: Number -> Number -> Number
@@ -27,32 +39,19 @@ microFlow config state epsilon =
     }
 
 -- ===Coord Transformation===
-coordPosition :: Config -> State -> { x :: Number, y :: Number }
-coordPosition { radius } { position } =
+stateToCartesianPosition :: Config -> State -> Point.Point
+stateToCartesianPosition { radius } { position } =
   { x: radius * cos position, y: radius * sin position }
 
 -- ===Rendering===
-
-render :: (Canvas.CanvasRef -> Effect Unit) -> ({ x :: Number, y :: Number } -> { canvasX :: Number, canvasY :: Number }) -> Config -> State -> Canvas.CanvasRef -> Effect Unit
-render clear fromCartesianToCanvas config state canvasRef = do
-  canvasRef # clear
-  let pendulumCenterCanvasCoord = fromCartesianToCanvas (coordPosition config state)
-  let cartesianOrigin = fromCartesianToCanvas { x : 0.0, y : 0.0 }
-
-  line <- Canvas.makePath2D
-  line # Canvas.moveTo cartesianOrigin.canvasX cartesianOrigin.canvasY
-  line # Canvas.lineTo pendulumCenterCanvasCoord.canvasX pendulumCenterCanvasCoord.canvasY
-  canvasRef # Canvas.stroke line
-
-  circle <- Canvas.makePath2D
-  circle # Canvas.arc pendulumCenterCanvasCoord.canvasX pendulumCenterCanvasCoord.canvasY 20.0 0.0 (2.0*pi) -- 20 is in pixels
-  canvasRef # Canvas.stroke circle
-
-  pure unit
-
-renderState :: (Canvas.CanvasRef -> Effect Unit) -> ({ x :: Number, y :: Number } -> { canvasX :: Number, canvasY :: Number }) -> Config -> State -> Canvas.CanvasRef -> Effect Unit
-renderState clear fromCartesianToCanvas config state canvasRef = do
-  pure unit
+view :: Config -> State -> Element.Element
+view config state =
+  let 
+      pendulumCenter :: Point.Point
+      pendulumCenter = stateToCartesianPosition config state
+  in
+  Element.circle Color.black pendulumCenter 20.0 <> -- 20 is in pixels
+  Element.lineSegment Color.black Point.origin pendulumCenter
 
 data Msg =
     NewFrameRequested Number
@@ -63,8 +62,6 @@ update config msg state =
   case msg of
     NewFrameRequested frameDurationInMiliseconds -> do
       -- We need to convert miliseconds to seconds.
-      -- log (show frameDurationInMiliseconds)
-      -- log (show state)
       pure (System.integrate (microFlow config) (frameDurationInMiliseconds / 1000.0) state 0.001)
 
     ResetOfStateWasRequested newState ->

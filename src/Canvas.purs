@@ -6,6 +6,7 @@ module Canvas
   , stroke
   , fill
   , setFillStyle
+  , setStrokeStyle
   , clear
   , push
   , save
@@ -34,6 +35,7 @@ foreign import makePath2D :: Effect Path2D
 foreign import stroke :: Path2D -> CanvasRef -> Effect Unit
 foreign import fill :: Path2D -> CanvasRef -> Effect Unit
 foreign import setFillStyle :: String -> CanvasRef -> Effect Unit
+foreign import setStrokeStyle :: String -> CanvasRef -> Effect Unit
 foreign import foreignClear :: Number -> Number -> CanvasRef -> Effect Unit
 
 clear :: CanvasConfig -> CanvasRef -> Effect Unit
