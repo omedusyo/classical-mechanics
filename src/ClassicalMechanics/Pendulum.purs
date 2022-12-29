@@ -19,6 +19,9 @@ import CanvasGeometry.Element as Element
 import CanvasGeometry.Point as Point
 import CanvasGeometry.Color as Color
 
+type Point = Point.Point
+type Element = Element.Element
+
 -- First argument is the modulus. Is there a library for this?
 foreign import modByFloat :: Number -> Number -> Number
 
@@ -39,15 +42,15 @@ microFlow config state epsilon =
     }
 
 -- ===Coord Transformation===
-stateToCartesianPosition :: Config -> State -> Point.Point
+stateToCartesianPosition :: Config -> State -> Point
 stateToCartesianPosition { radius } { position } =
   { x: radius * cos position, y: radius * sin position }
 
 -- ===Rendering===
-view :: Config -> State -> Element.Element
+view :: Config -> State -> Element
 view config state =
   let 
-      pendulumCenter :: Point.Point
+      pendulumCenter :: Point
       pendulumCenter = stateToCartesianPosition config state
   in
   Element.circle Color.black pendulumCenter 20.0 <> -- 20 is in pixels

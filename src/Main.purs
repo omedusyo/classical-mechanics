@@ -18,15 +18,11 @@ import Event as Event
 import Canvas as Canvas
 import CanvasGeometry.Element as Element 
 
+type CanvasConfig = Canvas.CanvasConfig
+type CanvasRef = Canvas.CanvasRef
 
-canvasConfig0 :: Canvas.CanvasConfig
+canvasConfig0 :: CanvasConfig
 canvasConfig0 = { width: 1000.0, height: 900.0 }
-
-cartesianToCanvasCoord :: Canvas.CanvasConfig -> { x :: Number, y :: Number } -> { canvasX :: Number, canvasY :: Number }
-cartesianToCanvasCoord canvas { x, y } =
-  -- 1 meter == 10 pixels
-  let scale = 10.0 in
-  { canvasX: canvas.width/2.0 + scale * x, canvasY: canvas.height/2.0 - scale * y }
 
 main :: Effect Unit
 main = do
@@ -169,7 +165,7 @@ main = do
 
   pure unit
 
-clearWithOpacity :: Canvas.CanvasConfig -> Canvas.CanvasRef -> Effect Unit
+clearWithOpacity :: CanvasConfig -> CanvasRef -> Effect Unit
 clearWithOpacity canvas canvasRef = do
   rectangle <- Canvas.makePath2D
   rectangle # Canvas.rect 0.0 0.0 canvas.width canvas.height

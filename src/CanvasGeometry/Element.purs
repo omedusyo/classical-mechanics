@@ -9,12 +9,17 @@ import Canvas as Canvas
 import Data.Number ( pi )
 import Data.Traversable ( traverse_ )
 
+type Point = Point.Point
+type Color = Color.Color
+type CanvasConfig = Canvas.CanvasConfig
+type CanvasRef = Canvas.CanvasRef
+
 
 -- TODO: Introduce proper attributes
 data PrimitiveElement =
-    Circle Color.Color Point.Point Number
-  | Disk Color.Color Point.Point Number
-  | LineSegment Color.Color Point.Point Point.Point
+    Circle Color Point Number
+  | Disk Color Point Number
+  | LineSegment Color Point Point
 
 instance showPrimitiveElement :: Show PrimitiveElement where
   show (Circle color center radius) =
@@ -28,33 +33,33 @@ instance showPrimitiveElement :: Show PrimitiveElement where
 
 type Element = Array PrimitiveElement
 
-colorToString :: Color.Color -> String
+colorToString :: Color -> String
 colorToString (Color.RGBA r g b a) =
   "rgba(" <> show r <> "," <> show g <> "," <> show b <> "," <> show a <> ")"
 
-circle :: Color.Color -> Point.Point -> Number -> Element
+circle :: Color -> Point -> Number -> Element
 circle color center radius = [ Circle color center radius ]
 
-lineSegment :: Color.Color -> Point.Point -> Point.Point -> Element
+lineSegment :: Color -> Point -> Point -> Element
 lineSegment color p0 p1 = [ LineSegment color p0 p1 ]
 
 view :: Element
 view =
-  let center :: Point.Point
+  let center :: Point
       center = (Point.add Point.origin (Vector.make 15.0 16.0)) in
   circle Color.black center 5.0 <>
   lineSegment Color.black Point.origin center
 
 -- ===Rendering===
-cartesianToCanvasCoord :: Canvas.CanvasConfig -> Point.Point -> { canvasX :: Number, canvasY :: Number }
-cartesianToCanvasCoord canvas { x, y } =
+cartesianToCanvasCoord :: CanvasConfig -> Point -> { canvasX :: Number, canvasY :: Number }
+cartesianToCanvasCoord canvas p =
   -- TODO: This scale should be an open parameter...
   -- 1 meter == 10 pixels
   let scale = 10.0 in
-  { canvasX: canvas.width/2.0 + scale * x, canvasY: canvas.height/2.0 - scale * y }
+  { canvasX: canvas.width/2.0 + scale * p.x, canvasY: canvas.height/2.0 - scale * p.y }
 
 
-renderPrimitiveElement :: Canvas.CanvasConfig -> Canvas.CanvasRef -> PrimitiveElement -> Effect Unit
+renderPrimitiveElement :: CanvasConfig -> CanvasRef -> PrimitiveElement -> Effect Unit
 renderPrimitiveElement config canvasRef =
   case _ of
     Circle color center radius -> do
@@ -84,6 +89,6 @@ renderPrimitiveElement config canvasRef =
 
 -- TODO: Would be nice if CanvasRef actually contained width/height information
 --       To get the width/height, you need to do an effect, since that may change.
-render :: Canvas.CanvasConfig -> Canvas.CanvasRef -> Element -> Effect Unit
+render :: CanvasConfig -> CanvasRef -> Element -> Effect Unit
 render config canvasRef el =
   el # traverse_ (renderPrimitiveElement config canvasRef)
