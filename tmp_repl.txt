@@ -17,6 +17,21 @@ or you can use
   npx webpack ./main.js
 
 
+=========deployment============
+npx webpack ./main.js
+cd ~/Desktop/omedusyo.github.io/pendulum/
+cp ~/PROJECTS/PureScript/classical-mechanics/index-for-deployment.html index.html
+cp ~/PROJECTS/PureScript/classical-mechanics/dist/main.js dist/main.js
+git add .
+git commit -m "Classical Mechanics update"
+git push
+cd ~/PROJECTS/PureScript/classical-mechanics
+
+firefox https://github.com/omedusyo/omedusyo.github.io/actions
+firefox https://omedusyo.github.io/pendulum/index.html
+=========deployment============
+
+
 
 spago install lib1 lib2
 

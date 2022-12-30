@@ -11,7 +11,6 @@ import VDOM.Examples (ex1, updateCounter, initialCounterModel, viewCounter)
 import Effect.Extra.Timer as Timer
 import Duration as Duration
 import Data.Number ( pi )
-import ClassicalMechanics.Pendulum as Pendulum
 import ClassicalMechanics.DoublePendulum as DoublePendulum
 import ClassicalMechanics.System as System
 import Store as Store
