@@ -158,3 +158,55 @@ import ClassicalMechanics.Pendulum as Pendulum
 
 Pendulum.modByFloat 3.0 8.4
 
+
+:paste
+safsdf x y = 
+  x + y
+
+import Data.Number ( cos, sin, pi )
+
+:paste
+microFlow { massR, massS, radiusR, radiusS, gravity } { time, positionR, positionS, velocityR, velocityS } epsilon =
+  let u = cos (positionR - positionS)
+      v = sin (positionR - positionS)
+      radiusProduct = radiusR*radiusS
+      massSum = massR + massS
+      a = massSum*radiusR*radiusR + massS * radiusProduct * u
+      b = radiusProduct*u
+      c = radiusS*radiusS
+      x = -(radiusS*radiusProduct*v*velocityS*velocityS + 0.5*gravity*massSum*radiusR*cos positionR)
+      y = radiusProduct*v*(massS*velocityR*velocityS + velocityR*(velocityR - velocityS))
+      a' = 1.0/a 
+      b' = - b/(a*c)
+      c' = 1.0/c
+      x' = a'*x + b'*y
+      y' = c'*y
+   in
+   { time: time + epsilon 
+   , positionR: (positionR + epsilon * velocityR)
+   , positionS: (positionS + epsilon * velocityS)
+   , velocityR: velocityR + epsilon * x'
+   , velocityS: velocityS + epsilon * y'
+   }
+
+
+
+:paste
+state0 =
+  { time: 0.0
+  , positionR: -0.25 * 2.0*pi
+  , positionS: -0.35 * 2.0*pi
+  , velocityR: -0.0
+  , velocityS: 0.0
+  }
+
+:paste
+config0 =
+  { gravity: 9.8 -- meter/second^2
+  , radiusR: 25.0 -- meter
+  , radiusS: 15.0 -- meter
+  , massR : 5.0 -- kg
+  , massS :  1.25 -- kg
+  }
+
+microFlow config0 state0 0.001

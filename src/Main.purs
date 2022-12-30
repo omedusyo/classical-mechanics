@@ -12,12 +12,15 @@ import Effect.Extra.Timer as Timer
 import Duration as Duration
 import Data.Number ( pi )
 import ClassicalMechanics.Pendulum as Pendulum
+import ClassicalMechanics.DoublePendulum as DoublePendulum
+import ClassicalMechanics.System as System
 import Store as Store
 import Event as Event
 
 import Canvas as Canvas
 import CanvasGeometry.Element as Element 
 
+type Element = Element.Element
 type CanvasConfig = Canvas.CanvasConfig
 type CanvasRef = Canvas.CanvasRef
 
@@ -73,15 +76,33 @@ main = do
   -- path # Canvas.lineTo 50.0 50.0
   -- canvasRef # Canvas.fill path
 
-  let pendulumState0 = { time: 0.0, position: 0.0 * 2.0*pi, velocity: 0.0 }
-  let pendulumState1 = { time: 0.0, position: 0.15 * 2.0*pi, velocity: 0.0 }
-  let pendulumState2 = { time: 0.0, position: 0.15 * 2.0*pi, velocity: -2.0 }
-  let pendulumState3 = { time: 0.0, position: 0.15 * 2.0*pi, velocity: 6.0 }
-  let pendulumState4 = { time: 0.0, position: -0.25 * 2.0*pi, velocity: 0.0 }
-  let pendulumState5 = { time: 0.0, position: -0.26 * 2.0*pi, velocity: 0.0 }
-  let pendulumState6 = { time: 0.0, position: -0.25 * 2.0*pi, velocity: 20.0 }
+  -- let pendulumState0 = { time: 0.0, position: 0.0 * 2.0*pi, velocity: 0.0 }
+  let pendulumState0 =
+        { time: 0.0
+        -- angle
+        , positionR: -0.15 * 2.0*pi
+        , positionS: 0.0 * 2.0*pi
+        -- angular velocity
+        , velocityR: -2.0
+        , velocityS: 3.5
+        }
 
-  let pendulumConfig = Pendulum.config0 { radius: 25.0 }
+  -- let pendulumState1 = { time: 0.0, position: 0.15 * 2.0*pi, velocity: 0.0 }
+  -- let pendulumState2 = { time: 0.0, position: 0.15 * 2.0*pi, velocity: -2.0 }
+  -- let pendulumState3 = { time: 0.0, position: 0.15 * 2.0*pi, velocity: 6.0 }
+  -- let pendulumState4 = { time: 0.0, position: -0.25 * 2.0*pi, velocity: 0.0 }
+  -- let pendulumState5 = { time: 0.0, position: -0.26 * 2.0*pi, velocity: 0.0 }
+  -- let pendulumState6 = { time: 0.0, position: -0.25 * 2.0*pi, velocity: 20.0 }
+
+  -- let pendulumConfig = Pendulum.config0 { radius: 25.0 }
+  let pendulumConfig =
+        { gravity: 9.8 -- meter/second^2
+        , radiusR: 25.0 -- meter
+        , radiusS: 10.0 -- meter
+        , massR : 2.0 -- kg
+        , massS :  50.0 -- kg
+        }
+
   let initState =
         { shouldRequestAnimationFrame: true
         , timestamp: 0.0
@@ -93,20 +114,20 @@ main = do
         Event.requestAnimationFrame
           (\timestamp -> do
             state <- store # Store.getModel
-            store # Store.send { shouldRequestAnimationFrame: state.shouldRequestAnimationFrame, timestamp: timestamp, pendulumMsg: Pendulum.NewFrameRequested (timestamp - state.timestamp) }
+            store # Store.send { shouldRequestAnimationFrame: state.shouldRequestAnimationFrame, timestamp: timestamp, pendulumMsg: DoublePendulum.NewFrameRequested (timestamp - state.timestamp) }
           )
 
   pendulumStore <-
     Store.make
       (\pendulumStore msg state -> do
         newPendulumState <-
-          Pendulum.update pendulumConfig msg.pendulumMsg state.pendulumState
+          DoublePendulum.update pendulumConfig msg.pendulumMsg state.pendulumState
 
         canvasRef # Canvas.clear canvasConfig0
         Element.render
           canvasConfig0
           canvasRef
-          (Pendulum.view pendulumConfig newPendulumState)
+          (DoublePendulum.view pendulumConfig newPendulumState)
 
 
         if msg.shouldRequestAnimationFrame then do
@@ -125,43 +146,43 @@ main = do
   DOM.appendChild root button0
   DOM.setTextContent button0 "State 0"
 
-  button1 <- DOM.make "button"
-  DOM.appendChild root button1
-  DOM.setTextContent button1 "State 1"
+  -- button1 <- DOM.make "button"
+  -- DOM.appendChild root button1
+  -- DOM.setTextContent button1 "State 1"
 
-  button2 <- DOM.make "button"
-  DOM.appendChild root button2
-  DOM.setTextContent button2 "State 2"
+  -- button2 <- DOM.make "button"
+  -- DOM.appendChild root button2
+  -- DOM.setTextContent button2 "State 2"
 
-  button3 <- DOM.make "button"
-  DOM.appendChild root button3
-  DOM.setTextContent button3 "State 3"
+  -- button3 <- DOM.make "button"
+  -- DOM.appendChild root button3
+  -- DOM.setTextContent button3 "State 3"
 
-  button4 <- DOM.make "button"
-  DOM.appendChild root button4
-  DOM.setTextContent button4 "State 4"
+  -- button4 <- DOM.make "button"
+  -- DOM.appendChild root button4
+  -- DOM.setTextContent button4 "State 4"
 
-  button5 <- DOM.make "button"
-  DOM.appendChild root button5
-  DOM.setTextContent button5 "State 5"
+  -- button5 <- DOM.make "button"
+  -- DOM.appendChild root button5
+  -- DOM.setTextContent button5 "State 5"
 
-  button6 <- DOM.make "button"
-  DOM.appendChild root button6
-  DOM.setTextContent button6 "State 6"
+  -- button6 <- DOM.make "button"
+  -- DOM.appendChild root button6
+  -- DOM.setTextContent button6 "State 6"
 
   let attachResetStateOnClick button pendulumState =
         DOM.attachClickEvent button (do
             state <- pendulumStore # Store.getModel
-            pendulumStore # Store.send { shouldRequestAnimationFrame: false, timestamp: state.timestamp, pendulumMsg: Pendulum.ResetOfStateWasRequested pendulumState }
+            pendulumStore # Store.send { shouldRequestAnimationFrame: false, timestamp: state.timestamp, pendulumMsg: DoublePendulum.ResetOfStateWasRequested pendulumState }
           )
 
   attachResetStateOnClick button0 pendulumState0
-  attachResetStateOnClick button1 pendulumState1
-  attachResetStateOnClick button2 pendulumState2
-  attachResetStateOnClick button3 pendulumState3
-  attachResetStateOnClick button4 pendulumState4
-  attachResetStateOnClick button5 pendulumState5
-  attachResetStateOnClick button6 pendulumState6
+  -- attachResetStateOnClick button1 pendulumState1
+  -- attachResetStateOnClick button2 pendulumState2
+  -- attachResetStateOnClick button3 pendulumState3
+  -- attachResetStateOnClick button4 pendulumState4
+  -- attachResetStateOnClick button5 pendulumState5
+  -- attachResetStateOnClick button6 pendulumState6
 
   pure unit
 

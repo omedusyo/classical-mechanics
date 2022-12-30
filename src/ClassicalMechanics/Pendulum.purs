@@ -13,6 +13,7 @@ module ClassicalMechanics.Pendulum
 import Prelude
 import Effect (Effect)
 import ClassicalMechanics.System as System
+import ClassicalMechanics.Helper ( modByFloat )
 import Data.Number ( cos, sin, pi )
 
 import CanvasGeometry.Element as Element
@@ -21,9 +22,6 @@ import CanvasGeometry.Color as Color
 
 type Point = Point.Point
 type Element = Element.Element
-
--- First argument is the modulus. Is there a library for this?
-foreign import modByFloat :: Number -> Number -> Number
 
 
 type Config = { gravity :: Number, radius :: Number }
